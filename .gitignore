@@ -1,2 +1,3 @@
 packer.json
 packer_cache
+ubuntu-14_04/trusty_preseed.cfg
