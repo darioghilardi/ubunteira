@@ -1,0 +1,59 @@
+{
+  "variables": {
+    "ssh_name": "ssh_username",
+    "ssh_pass": "ssh_password",
+    "hostname": "hostname",
+    "vm_name": "virtual_machine_name",
+    "public_key": "host_machine_public_key"
+  },
+
+  "builders": [
+    {
+      "type": "vmware-iso",
+      "guest_os_type": "linux",
+      "disk_size" : 20000,
+      "vm_name": "{{ user `vm_name` }}",
+
+      "iso_url": "http://releases.ubuntu.com/14.04.1/ubuntu-14.04.1-server-amd64.iso",
+      "iso_checksum": "ca2531b8cd79ea5b778ede3a524779b9",
+      "iso_checksum_type": "md5",
+
+      "http_directory" : "ubuntu-14_04",
+      "http_port_min" : 9001,
+      "http_port_max" : 9001,
+
+      "ssh_username": "{{user `ssh_name`}}",
+      "ssh_password": "{{user `ssh_pass`}}",
+      "ssh_wait_timeout": "20m",
+      "shutdown_command": "echo {{user `ssh_pass`}} | sudo -S shutdown -P now",
+
+      "vmx_data": {
+        "memsize": "1024",
+        "numvcpus": "1",
+        "cpuid.coresPerSocket": "1"
+      },
+
+      "boot_command": [
+        "<esc><esc><enter><wait>",
+        "/install/vmlinuz noapic ",
+        "preseed/url=http://{{ .HTTPIP }}:{{ .HTTPPort }}/trusty_preseed.cfg ",
+        "debian-installer=en_US auto locale=en_US kbd-chooser/method=us ",
+        "hostname={{user `hostname`}} ",
+        "fb=false debconf/frontend=noninteractive ",
+        "keyboard-configuration/modelcode=SKIP keyboard-configuration/layout=it ",
+        "keyboard-configuration/variant=mac console-setup/ask_detect=false ",
+        "initrd=/install/initrd.gz -- <enter>"
+      ]
+    }
+  ],
+
+  "provisioners": [
+    {
+      "type": "shell",
+      "inline": [
+        "mkdir .ssh",
+        "echo '{{user `public_key`}}' >> .ssh/authorized_keys"
+      ]
+    }
+  ]
+}
