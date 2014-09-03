@@ -2,3 +2,4 @@ packer.json
 packer_cache
 ubuntu-14_04/trusty_preseed.cfg
 output-vmware-iso
+.DS_Store
